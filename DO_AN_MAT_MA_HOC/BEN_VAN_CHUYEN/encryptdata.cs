@@ -1,6 +1,10 @@
-﻿using System;
+﻿using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -49,7 +53,7 @@ namespace BEN_VAN_CHUYEN
             }
           
         }
-        public static bool DECRYPT_AND_VERIFY_DATA(string data,string publickeysender,string privatekeyreceiver)
+        public static string DECRYPT_AND_VERIFY_DATA(string data,string publickeysender,string privatekeyreceiver)
         {
             try
             {
@@ -69,15 +73,15 @@ namespace BEN_VAN_CHUYEN
                 // Verify the signature using the public key of the sender
                 bool isSignatureValid = VerifySignature(decryptedHash, signature, publickeysender);
                 MessageBox.Show(isSignatureValid.ToString());
-                return isSignatureValid;
+                return decryptedData;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                return false;
+                return null;
             }
         }
-        private static byte[] SignData(string data, string privateKey)
+        public static byte[] SignData(string data, string privateKey)
         {
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 
@@ -90,7 +94,7 @@ namespace BEN_VAN_CHUYEN
             }
         }
 
-        private static bool VerifySignature(string data, byte[] signature, string publicKey)
+        public static bool VerifySignature(string data, byte[] signature, string publicKey)
         {
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
 
@@ -102,7 +106,7 @@ namespace BEN_VAN_CHUYEN
                 return isSignatureValid;
             }
         }
-        private static string EncryptData(string data, string publicKey)
+        public static string EncryptData(string data, string publicKey)
         {
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             int chunkSize = 100; // Adjust this value to change the size of each chunk
@@ -134,7 +138,7 @@ namespace BEN_VAN_CHUYEN
             }
         }
 
-        private static string DecryptData(string encryptedData, string privateKey)
+        public static string DecryptData(string encryptedData, string privateKey)
         {
             try
             {
@@ -203,7 +207,7 @@ namespace BEN_VAN_CHUYEN
             }
         }*/
 
-        private static string ComputeSHA256Hash(string input)
+        public static string ComputeSHA256Hash(string input)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -222,6 +226,30 @@ namespace BEN_VAN_CHUYEN
         public static bool CompareHashes(string hash1, string hash2)
         {
             return StringComparer.OrdinalIgnoreCase.Compare(hash1, hash2) == 0;
+        }
+        public static string ConvertPdfToString(string pdfPath)
+        {
+            StringBuilder text = new StringBuilder();
+            PdfReader pdfReader = new PdfReader(pdfPath);
+
+            for (int page = 1; page <= pdfReader.NumberOfPages; page++)
+            {
+                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                string currentPageText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
+                text.Append(currentPageText);
+            }
+
+            pdfReader.Close();
+            return text.ToString();
+        }
+        public static void ConvertStringToPdf(string text, string outputFilePath)
+        {
+            using (Document document = new Document())
+            {
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outputFilePath, FileMode.Create));
+                document.Open();
+                document.Add(new Paragraph(text));
+            }
         }
     }
 }

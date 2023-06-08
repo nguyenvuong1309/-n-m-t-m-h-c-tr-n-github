@@ -39,8 +39,7 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.choosefile = new System.Windows.Forms.Button();
             this.pdfViewer1 = new Spire.PdfViewer.Forms.PdfViewer();
-            this.signPdfFile = new System.Windows.Forms.Button();
-            this.extractSignatureFromPdfFile = new System.Windows.Forms.Button();
+            this.encryptAES = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // port
@@ -116,15 +115,15 @@
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(419, 373);
+            this.textBox4.Location = new System.Drawing.Point(689, 224);
             this.textBox4.Multiline = true;
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(366, 130);
+            this.textBox4.Size = new System.Drawing.Size(151, 279);
             this.textBox4.TabIndex = 8;
             // 
             // choosefile
             // 
-            this.choosefile.Location = new System.Drawing.Point(709, 279);
+            this.choosefile.Location = new System.Drawing.Point(709, 195);
             this.choosefile.Name = "choosefile";
             this.choosefile.Size = new System.Drawing.Size(131, 23);
             this.choosefile.TabIndex = 10;
@@ -142,39 +141,28 @@
             this.pdfViewer1.MultiPagesThreshold = 60;
             this.pdfViewer1.Name = "pdfViewer1";
             this.pdfViewer1.OnRenderPageExceptionEvent = null;
-            this.pdfViewer1.Size = new System.Drawing.Size(654, 308);
+            this.pdfViewer1.Size = new System.Drawing.Size(654, 376);
             this.pdfViewer1.TabIndex = 12;
             this.pdfViewer1.Text = "pdfViewer1";
             this.pdfViewer1.Threshold = 60;
             this.pdfViewer1.ViewerBackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(229)))), ((int)(((byte)(229)))));
             // 
-            // signPdfFile
+            // encryptAES
             // 
-            this.signPdfFile.Location = new System.Drawing.Point(645, 103);
-            this.signPdfFile.Name = "signPdfFile";
-            this.signPdfFile.Size = new System.Drawing.Size(140, 23);
-            this.signPdfFile.TabIndex = 13;
-            this.signPdfFile.Text = "signPdfFile";
-            this.signPdfFile.UseVisualStyleBackColor = true;
-            this.signPdfFile.Click += new System.EventHandler(this.signPdfFile_Click);
-            // 
-            // extractSignatureFromPdfFile
-            // 
-            this.extractSignatureFromPdfFile.Location = new System.Drawing.Point(629, 152);
-            this.extractSignatureFromPdfFile.Name = "extractSignatureFromPdfFile";
-            this.extractSignatureFromPdfFile.Size = new System.Drawing.Size(211, 23);
-            this.extractSignatureFromPdfFile.TabIndex = 14;
-            this.extractSignatureFromPdfFile.Text = "extractSignatureFromPdfFile";
-            this.extractSignatureFromPdfFile.UseVisualStyleBackColor = true;
-            this.extractSignatureFromPdfFile.Click += new System.EventHandler(this.extractSignatureFromPdfFile_Click);
+            this.encryptAES.Location = new System.Drawing.Point(177, 125);
+            this.encryptAES.Name = "encryptAES";
+            this.encryptAES.Size = new System.Drawing.Size(143, 23);
+            this.encryptAES.TabIndex = 13;
+            this.encryptAES.Text = "encryptAES";
+            this.encryptAES.UseVisualStyleBackColor = true;
+            this.encryptAES.Click += new System.EventHandler(this.encryptAES_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(852, 515);
-            this.Controls.Add(this.extractSignatureFromPdfFile);
-            this.Controls.Add(this.signPdfFile);
+            this.ClientSize = new System.Drawing.Size(852, 583);
+            this.Controls.Add(this.encryptAES);
             this.Controls.Add(this.pdfViewer1);
             this.Controls.Add(this.choosefile);
             this.Controls.Add(this.textBox4);
@@ -206,8 +194,7 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Button choosefile;
         private Spire.PdfViewer.Forms.PdfViewer pdfViewer1;
-        private System.Windows.Forms.Button signPdfFile;
-        private System.Windows.Forms.Button extractSignatureFromPdfFile;
+        private System.Windows.Forms.Button encryptAES;
     }
 }
 

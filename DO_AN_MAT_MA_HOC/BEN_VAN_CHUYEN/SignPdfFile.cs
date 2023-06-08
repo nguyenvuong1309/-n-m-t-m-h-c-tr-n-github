@@ -1,9 +1,13 @@
-﻿using iTextSharp.text;
+﻿using iText.Signatures;
+using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -12,6 +16,7 @@ namespace BEN_VAN_CHUYEN
 {
     internal class SignPdfFile
     {
+    
         public static void AddStringSignatureToPDF(string inputFilePath, string outputFilePath, string signature)
         {
             // Load the PDF document
@@ -64,45 +69,6 @@ namespace BEN_VAN_CHUYEN
 
 
 
-        /* public static string ExtractStringSignatureFromPDF(string filePath)
-         {
-             // Load the PDF document
-             using (var reader = new PdfReader(filePath))
-             {
-                 // Initialize an empty string to store the extracted signature
-                 var signature = "";
-
-                 // Get the total number of pages in the PDF document
-                 int totalPages = reader.NumberOfPages;
-                 MessageBox.Show(totalPages.ToString());
-                 // Iterate over each page
-                 for (int pageIndex = 1; pageIndex <= totalPages; pageIndex++)
-                 {
-                     // Get the content byte array of the current page
-                     var contentBytes = reader.GetPageContent(pageIndex);
-
-                     // Parse the content bytes to extract the text
-                     var strategy = new SimpleTextExtractionStrategy();
-                     var extractedText = PdfTextExtractor.GetTextFromPage(reader, pageIndex, strategy);
-
-                     // Check if the extracted text contains the signature
-                     if (extractedText.Contains("th1s 1s s1gnature:"))
-                     {
-                         // Extract the signature from the extracted text
-                         // Adjust the extraction logic based on the structure of your signature
-                         // For example, you can use regular expressions to extract a specific pattern
-                         signature = extractedText;
-
-                         // Exit the loop if the signature is found on the current page
-                         break;
-                     }
-                 }
-
-                 // Return the extracted signature
-                 return signature;
-             }
-         }*/
-
         public static string ExtractStringSignatureFromPDF(string filePath)
         {
             // Load the PDF document
@@ -145,6 +111,115 @@ namespace BEN_VAN_CHUYEN
                 return signature;
             }
         }
+
+
+
+        public static string ConvertPdfToString(string pdfPath)
+        {
+            StringBuilder text = new StringBuilder();
+            PdfReader pdfReader = new PdfReader(pdfPath);
+
+            for (int page = 1; page <= pdfReader.NumberOfPages; page++)
+            {
+                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                string currentPageText = PdfTextExtractor.GetTextFromPage(pdfReader, page, strategy);
+                text.Append(currentPageText);
+            }
+
+            pdfReader.Close();
+            return text.ToString();
+        }
+        public static void ConvertStringToPdf(string text, string outputFilePath)
+        {
+            using (Document document = new Document())
+            {
+                PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outputFilePath, FileMode.Create));
+                document.Open();
+                document.Add(new Paragraph(text));
+            }
+        }
+        public static void AddStringToPdf(string inputFilePath, string outputFilePath, string additionalString)
+        {
+            // Read the input PDF file
+            PdfReader reader = new PdfReader(inputFilePath);
+
+            // Create a new PDF document
+            Document document = new Document();
+
+            // Create a PDF writer to write the modified content
+            PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outputFilePath, FileMode.Create));
+
+            // Open the document
+            document.Open();
+
+            // Create a new content byte array
+            PdfContentByte content = writer.DirectContent;
+
+            // Loop through each page of the input PDF
+            for (int pageNum = 1; pageNum <= reader.NumberOfPages; pageNum++)
+            {
+                // Import the page from the input PDF
+                PdfImportedPage importedPage = writer.GetImportedPage(reader, pageNum);
+
+                // Add the page to the new document
+                document.NewPage();
+
+                // Draw the imported page content onto the new document
+                content.AddTemplate(importedPage, 0, 0);
+
+                // Add the additional string to the new document
+                ColumnText.ShowTextAligned(content, Element.ALIGN_LEFT, new Phrase(additionalString), 100, 100, 0);
+            }
+
+            // Close the document
+            document.Close();
+
+            // Close the reader
+            reader.Close();
+        }
+
+
+        public string RemoveAndRetrieveLast64Bits(string inputFilePath)
+        {
+            // Read the input PDF file
+            PdfReader reader = new PdfReader(inputFilePath);
+
+            // Variable to store the last 64 bits
+            string last64Bits = "";
+
+            // Get the last 64 bits from the file
+            if (reader.XrefSize > 0)
+            {
+                int lastObjNum = reader.XrefSize - 1;
+                PdfObject lastObj = reader.GetPdfObject(lastObjNum);
+                if (lastObj != null && lastObj.IsStream())
+                {
+                    PRStream stream = (PRStream)lastObj;
+                    byte[] streamBytes = PdfReader.GetStreamBytes(stream);
+
+                    // Check if the stream contains at least 8 bytes
+                    if (streamBytes.Length >= 8)
+                    {
+                        // Get the last 64 bits (8 bytes) from the stream
+                        byte[] last64BitsBytes = new byte[8];
+                        Array.Copy(streamBytes, streamBytes.Length - 8, last64BitsBytes, 0, 8);
+                        last64Bits = BitConverter.ToString(last64BitsBytes).Replace("-", "");
+
+                        // Remove the last 64 bits from the stream
+                        Array.Resize(ref streamBytes, streamBytes.Length - 8);
+                        stream.Clear();
+                        stream.SetData(streamBytes);
+                    }
+                }
+            }
+
+            // Close the reader
+            reader.Close();
+
+            // Return the last 64 bits as a hexadecimal string
+            return last64Bits;
+        }
+
 
 
     }
